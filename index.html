@@ -79,7 +79,7 @@
     }
 
     // Get GeoJSON and put on it on the map when it loads
-    airports= L.geoJson.ajax("assets/airports.geojson", {
+    airports= L.geoJson.ajax("Assets/airports.geojson", {
         // assign a function to the onEachFeature parameter of the cellTowers object.
         // Then each (point) feature will bind a popup window.
         // The content of the popup window is the value of `feature.properties.company`
@@ -98,7 +98,7 @@
 
     // create the states layer
     var states = null;
-    states= L.geoJson.ajax("assets/us-states.geojson", {
+    states= L.geoJson.ajax("Assets/us-states.geojson", {
         style: style
     }).addTo(mymap);
 
