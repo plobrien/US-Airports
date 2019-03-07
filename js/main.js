@@ -23,7 +23,7 @@ for (i = 0; i < 9; i++) {
 }
 
 // Get GeoJSON and put on it on the map when it loads
-cellTowers= L.geoJson.ajax("assets/airports.geojson", {
+airports= L.geoJson.ajax("assets/airports.geojson", {
     // assign a function to the onEachFeature parameter of the cellTowers object.
     // Then each (point) feature will bind a popup window.
     // The content of the popup window is the value of `feature.properties.company`
@@ -32,15 +32,17 @@ cellTowers= L.geoJson.ajax("assets/airports.geojson", {
     },
     pointToLayer: function (feature, latlng) {
         var id = 0;
-        if (feature.properties.company == "New Cingular") { id = 0; }
-        else { id = 8;} //
+        if (feature.properties.CNTL_TWR == "Y") { id = 0; }
+        else if (feature.properties.CNTL_TWR == "N")  { id = 4; }
+        else { id = 2;} //
         return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-' + (id + 1).toString() })});
     },
-    attribution: 'Airport Data &copy; Map Cruzin | States &copy; Oregon Explorer | Base Map &copy; CartoDB | Made By Paul OBrien'
+    attribution: 'Airport Data &copy; DATA.gov | States &copy; Mike Bostock | Base Map &copy; CartoDB | Made By Paul OBrien'
 }).addTo(mymap);
 
 // create the states layer
-L.geoJson.ajax("assets/us-states.geojson", {
+var states = null;
+states= L.geoJson.ajax("assets/us-states.geojson", {
     style: style
 }).addTo(mymap);
 
@@ -95,4 +97,4 @@ legend.onAdd = function () {
 legend.addTo(mymap);
 
 // 12. Add a scale bar to map
-L.control.scale({position: 'bottomleft'}).addTo(
+L.control.scale({position: 'bottomleft'}).addTo(mymap);
