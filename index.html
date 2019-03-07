@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Cell Towers in Oregon (2009)</title>
+    <title>Airports in the United States</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
     <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
@@ -57,7 +57,7 @@
     // 1. Create a map object.
     var mymap = L.map('map', {
         center: [44.13, -119.93],
-        zoom: 7,
+        zoom: 4,
         maxZoom: 10,
         minZoom: 3,
         detectRetina: true});
@@ -89,7 +89,7 @@
         pointToLayer: function (feature, latlng) {
             var id = 0;
             if (feature.properties.company == "New Cingular") { id = 0; }
-            else { id = 8;} // 
+            else { id = 8;} //
             return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-' + (id + 1).toString() })});
         },
         attribution: 'Airport Data &copy; Map Cruzin | States &copy; Oregon Explorer | Base Map &copy; CartoDB | Made By Paul OBrien'
