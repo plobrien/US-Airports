@@ -93,11 +93,12 @@
             else { id = 2;} //
             return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-' + (id + 1).toString() })});
         },
-        attribution: 'Airport Data &copy; Map Cruzin | States &copy; Oregon Explorer | Base Map &copy; CartoDB | Made By Paul OBrien'
+        attribution: 'Airport Data &copy; DATA.gov | States &copy; Mike Bostock | Base Map &copy; CartoDB | Made By Paul OBrien'
     }).addTo(mymap);
 
     // create the states layer
-    L.geoJson.ajax("assets/us-states.geojson", {
+    var states = null;
+    states= L.geoJson.ajax("assets/us-states.geojson", {
         style: style
     }).addTo(mymap);
 
