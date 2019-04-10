@@ -119,7 +119,7 @@
     // create the states layer
     var states = null;
     states= L.geoJson.ajax("Assets/us-states.geojson", {
-        style: style
+        style: style,
         onEachFeature: function (feature, label) {
            label.bindTooltip(feature.properties.NAME, {className: 'feature-label', permanent:true, direction: 'center'});
            labels.push(label);
