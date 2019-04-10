@@ -1,3 +1,20 @@
+// 14. This is core of how Labelgun works. We must provide two functions, one
+// that hides our labels, another that shows the labels. These are essentially
+// callbacks that labelgun uses to actually show and hide our labels
+// In this instance we set the labels opacity to 0 and 1 respectively.
+var hideLabel = function(label){ label.labelObject.style.opacity = 0;};
+var showLabel = function(label){ label.labelObject.style.opacity = 1;};
+var labelEngine = new labelgun.default(hideLabel, showLabel);
+var labels = [];
+
+// 18. define the coordinate reference system (CRS)
+mycrs = new L.Proj.CRS('EPSG:2991',
+    '+proj=lcc +lat_1=43 +lat_2=45.5 +lat_0=41.75 +lon_0=-120.5 +x_0=400000 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs',
+    {
+        resolutions: [8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1] // example zoom level resolutions
+    }
+);
+
 // 1. Create a map object.
 var mymap = L.map('map', {
     center: [44.13, -119.93],
@@ -45,6 +62,10 @@ var states = null;
 states= L.geoJson.ajax("assets/us-states.geojson", {
     style: style
 }).addTo(mymap);
+onEachFeature: function (feature, label) {
+        label.bindTooltip(feature.properties.NAME, {className: 'feature-label', permanent:true, direction: 'center'});
+        labels.push(label);
+    }
 
 // 6. Set function for color ramp
 colors = chroma.scale('OrRd').colors(5); //colors = chroma.scale('RdPu').colors(5);
@@ -98,3 +119,61 @@ legend.addTo(mymap);
 
 // 12. Add a scale bar to map
 L.control.scale({position: 'bottomleft'}).addTo(mymap);
+
+// 13. Add a latlng graticules.
+L.latlngGraticule({
+    showLabel: true,
+    opacity: 0.2,
+    color: "#747474",
+    zoomInterval: [
+        {start: 3, end: 7, interval: 2},
+        {start: 8, end: 10, interval: 0.5}
+    ]
+}).addTo(mymap);
+
+
+// 16. create an addLabel function to dynamically update the visible labels, aiming to avoid the lable overlap.
+
+function addLabel(layer, id) {
+
+    // This is ugly but there is no getContainer method on the tooltip :(
+    var label = layer.getTooltip()._source._tooltip._container;
+    if (label) {
+        // We need the bounding rectangle of the label itself
+        var rect = label.getBoundingClientRect();
+
+        // We convert the container coordinates (screen space) to Lat/lng
+        var bottomLeft = mymap.containerPointToLatLng([rect.left, rect.bottom]);
+        var topRight = mymap.containerPointToLatLng([rect.right, rect.top]);
+        var boundingBox = {
+            bottomLeft : [bottomLeft.lng, bottomLeft.lat],
+            topRight   : [topRight.lng, topRight.lat]
+        };
+
+        // Ingest the label into labelgun itself
+        labelEngine.ingestLabel(
+            boundingBox,
+            id,
+            parseInt(Math.random() * (5 - 1) + 1), // Weight
+            label,
+            label.innerText,
+            false
+        );
+
+        // If the label hasn't been added to the map already
+        // add it and set the added flag to true
+        if (!layer.added) {
+            layer.addTo(mymap);
+            layer.added = true;
+        }
+    }
+}
+
+// 17. We will update the visualization of the labels whenever you zoom the map.
+mymap.on("zoomend", function(){
+    var i = 0;
+    counties.eachLayer(function(label){
+        addLabel(label, ++i);
+    });
+    labelEngine.update();
+});
