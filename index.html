@@ -43,6 +43,17 @@
             margin: 0;
         }
 
+        .leaflet-tooltip.feature-label {
+            background-color: transparent;
+            border: transparent;
+            box-shadow: none;
+            font-weight: bold;
+            font-size: 12px;
+            font-family: 'Titillium Web', sans-serif;
+            text-shadow: 0 0 2px #FFFFFF;
+            color: rgba(35, 35, 35, 0.78)
+        }
+
     </style>
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
@@ -53,6 +64,15 @@
 <!-- Our web map and content will go here -->
 <div id="map"></div>
 <script>
+
+// 14. This is core of how Labelgun works. We must provide two functions, one
+    // that hides our labels, another that shows the labels. These are essentially
+    // callbacks that labelgun uses to actually show and hide our labels
+    // In this instance we set the labels opacity to 0 and 1 respectively.
+    var hideLabel = function(label){ label.labelObject.style.opacity = 0;};
+    var showLabel = function(label){ label.labelObject.style.opacity = 1;};
+    var labelEngine = new labelgun.default(hideLabel, showLabel);
+    var labels = [];
 
     // 1. Create a map object.
     var mymap = L.map('map', {
@@ -100,6 +120,10 @@
     var states = null;
     states= L.geoJson.ajax("Assets/us-states.geojson", {
         style: style
+        onEachFeature: function (feature, label) {
+           label.bindTooltip(feature.properties.NAME, {className: 'feature-label', permanent:true, direction: 'center'});
+           labels.push(label);
+        }
     }).addTo(mymap);
 
     // 6. Set function for color ramp
@@ -154,6 +178,57 @@
 
     // 12. Add a scale bar to map
     L.control.scale({position: 'bottomleft'}).addTo(mymap);
+
+    // 13. Add a latlng graticules.
+    L.latlngGraticule({
+      showLabel: true,
+      opacity: 0.2,
+      color: "#747474",
+      zoomInterval: [
+          {start: 3, end: 7, interval: 2},
+          {start: 8, end: 10, interval: 0.5}
+      ]
+    }).addTo(mymap);
+
+    // 16. create an addLabel function to dynamically update the visible labels, aiming to avoid the lable overlap.
+    function addLabel(layer, id) {
+        // This is ugly but there is no getContainer method on the tooltip :(
+        var label = layer.getTooltip()._source._tooltip._container;
+        if (label) {
+            // We need the bounding rectangle of the label itself
+            var rect = label.getBoundingClientRect();
+            // We convert the container coordinates (screen space) to Lat/lng
+            var bottomLeft = mymap.containerPointToLatLng([rect.left, rect.bottom]);
+            var topRight = mymap.containerPointToLatLng([rect.right, rect.top]);
+            var boundingBox = {
+                bottomLeft : [bottomLeft.lng, bottomLeft.lat],
+                topRight   : [topRight.lng, topRight.lat]
+            };
+            // Ingest the label into labelgun itself
+            labelEngine.ingestLabel(
+                boundingBox,
+                id,
+                parseInt(Math.random() * (5 - 1) + 1), // Weight
+                label,
+                label.innerText,
+                false
+            );
+            // If the label hasn't been added to the map already
+            // add it and set the added flag to true
+            if (!layer.added) {
+                layer.addTo(mymap);
+                layer.added = true;
+            }
+        }
+    }
+    // 17. We will update the visualization of the labels whenever you zoom the map.
+    mymap.on("zoomend", function(){
+        var i = 0;
+        counties.eachLayer(function(label){
+            addLabel(label, ++i);
+        });
+        labelEngine.update();
+    });
 
 </script>
 </body>
