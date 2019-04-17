@@ -143,10 +143,6 @@
     var states = null;
     counties = L.geoJson.ajax("Assets/us-states.geojson", {
         style: style,
-        onEachFeature: function (feature, label) {
-            label.bindTooltip(feature.properties.NAME, {className: 'feature-label', permanent:true, direction: 'center'});
-            labels.push(label);
-        }
     }).addTo(mymap);
     // 9. Create Leaflet Control Object for Legend
     var legend = L.control({position: 'topright'});
