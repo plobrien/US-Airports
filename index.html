@@ -103,13 +103,13 @@
         // Then each (point) feature will bind a popup window.
         // The content of the popup window is the value of `feature.properties.company`
         onEachFeature: function (feature, layer) {
-            layer.bindPopup(feature.properties.company);
+            layer.bindPopup(feature.properties.AIRPT_NAME);
         },
         pointToLayer: function (feature, latlng) {
             var id = 0;
-            if (feature.properties.company == "New Cingular") { id = 0; }
-            if (feature.properties.company == "New Cingular") { id = 0; }
-            else { id = 8;} // "Salem Cellular"
+            if (feature.properties.CNTL_TWR == "Y") { id = 0; }
+            else if (feature.properties.CNTL_TWR == "N") { id = 4; }
+            else { id = 2;} // "Salem Cellular"
             return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-' + (id + 1).toString() })});
         },
         attribution: 'Airport Data &copy; DATA.gov | States &copy; Mike Bostock | Base Map &copy; CartoDB | Made By Paul OBrien'
