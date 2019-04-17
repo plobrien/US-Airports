@@ -86,6 +86,7 @@
         minZoom: 3,
         detectRetina: true});
     // 2. Add a base map.
+    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(mymap);  
     // 20. comment off the base map, because the publicly shared base map usually cannot reprojected
     // L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(mymap);
     // 3. Add cell towers GeoJSON Data
@@ -107,8 +108,8 @@
         },
         pointToLayer: function (feature, latlng) {
             var id = 0;
-            if (feature.properties.CNTL_TWR == "Y") { id = 0; }
-            else if (feature.properties.CNTL_TWR == "N") { id = 4; }
+            if (feature.properties.CNTL_TWR == "N") { id = 0; }
+            else if (feature.properties.CNTL_TWR == "Y") { id = 4; }
             else { id = 2;} // "Salem Cellular"
             return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-' + (id + 1).toString() })});
         },
