@@ -1,5 +1,7 @@
 # US Airports
 
+![](OSU.jpg)
+
 https://plobrien.github.io/US-Airports/
 
 
@@ -31,4 +33,4 @@ Airport Data: DATA.gov
 
 States Data: Mike Bostock
 
-Projection: Spatial Reference 
+Projection: Spatial Reference
