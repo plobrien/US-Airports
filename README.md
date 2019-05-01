@@ -1,7 +1,5 @@
 # US Airports
 
-![](OSU.jpg)
-
 https://plobrien.github.io/US-Airports/
 
 
